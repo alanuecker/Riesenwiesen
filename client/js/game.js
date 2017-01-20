@@ -31,9 +31,4 @@ class Game{
         // This is where you draw everything
 
     };
-
-    drawRectangle(canvas) {
-        canvas.fillStyle = "green";
-        canvas.fillRect(10, 10, 100, 100);
-    }
 }
