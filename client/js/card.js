@@ -1,19 +1,42 @@
-class Card{
-    constructor(x, y, id, type){
-        this. x = x;
-        this.y = y;
+class Card extends createjs.Container{
+    constructor(xPos, yPos, id, type){
+        super();
+
+        this.draw();
+        this.xPos = xPos;
+        this.yPos = yPos;
         this.id = id;
         this.type = type;
         this.width = 100;
         this.color = ["grey", "green"];
+
+        this.init();
     }
 
-    getX(){
-        return this.x;
+    init(){
+        this.rect = new createjs.Shape();
+        this.rect.graphics.beginFill(this.color[this.type]).drawRect(0, 0, this.width, this.width);
+
+        this.rect.addEventListener("mousedown", function (event) {
+            console.log(event);
+            if(event.nativeEvent.button == 0){
+                //left button
+                console.log(this.id);
+            }else{
+                //right or middle button
+                console.log(this.id);
+            }
+        }.bind(this));
+
+        stage.addChild(this.rect);
     }
 
-    getY(){
-        return this.y;
+    getXPos(){
+        return this.xPos;
+    }
+
+    getYPos(){
+        return this.yPos;
     }
 
     getType(){
@@ -25,13 +48,10 @@ class Card{
     }
 
     draw(){
-        let x = this.x * this.width + c.width/2 - this.width/2;
-        let y = this.y * this.width + c.height/2 - this.width/2;
-        this.drawRect(x, y, this.width, this.width, this.color[this.type]);
-    }
-
-    drawRect(x, y, h, w, color){
-        canvas.fillStyle = color;
-        canvas.fillRect(x, y, h, w);
+        let x = this.xPos * this.width + c.width/2 - this.width/2;
+        let y = this.yPos * this.width + c.height/2 - this.width/2;
+        this.x = x;
+        this.y = y;
     }
 }
+createjs.promote(Card, "Container");

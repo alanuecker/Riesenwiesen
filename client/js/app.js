@@ -6,8 +6,10 @@ let screenWidth = window.innerWidth;
 let screenHeight = window.innerHeight;
 
 //let canvas = new fabric.Canvas('canvas');
+let stage = new createjs.Stage("cvs");
+stage.autoClear = true;
 let c = document.getElementById('cvs');
-let canvas = c.getContext('2d');
+c.addEventListener('contextmenu', event => event.preventDefault());
 c.width = screenWidth;
 c.height = screenHeight;
 
@@ -41,7 +43,7 @@ let global = {
     lineColor: '#000000',
 };
 
-let game = new Game(canvas, global);
+let game = new Game(global);
 
 function startGame() {
     playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, '');
@@ -107,7 +109,7 @@ function animloop(){
 
 function gameLoop() {
   game.handleLogic();
-  game.handleGraphics(canvas);
+  game.handleGraphics();
 }
 
 window.addEventListener('resize', function() {
