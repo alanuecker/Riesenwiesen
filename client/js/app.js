@@ -116,4 +116,6 @@ window.addEventListener('resize', function() {
     screenHeight = window.innerHeight;
     c.width = screenWidth;
     c.height = screenHeight;
+
+    game.drawCards();
 }, true);

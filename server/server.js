@@ -5,17 +5,17 @@ let io      = require('socket.io')(http);
 
 let config  = require('./config.json');
 
-let data = {data: "test"};
+let Field = require('./field.js');
+let Card = require('./card.js');
+
+let field = new Field();
 
 app.use(express.static(__dirname + '/../client'));
 
 io.on('connection', function (socket) {
     console.log("Somebody connected!");
-
-    socket.emit('hello');
-
-    socket.on('sendData', function () {
-       socket.emit('data', data);
+    socket.on('getAllCards', function () {
+       socket.emit('setAllCards', field.getCards());
     });
     // Write your code here
 });
