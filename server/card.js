@@ -1,8 +1,8 @@
 module.exports = class Card{
-    constructor(x, y, field){
+    constructor(x, y, id, type){
         this. x = x;
         this.y = y;
-        this.id = field.getPositionID(x, y);
-        this.type = field.getPositionType(this.id);
+        this.id = id;
+        this.type = type;
     }
 };

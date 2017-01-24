@@ -14,6 +14,9 @@ app.use(express.static(__dirname + '/../client'));
 
 io.on('connection', function (socket) {
     console.log("Somebody connected!");
+
+    socket.emit('setInitData');
+
     socket.on('getAllCards', function () {
        socket.emit('setAllCards', field.getCards());
     });

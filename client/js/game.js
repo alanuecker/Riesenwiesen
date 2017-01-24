@@ -1,5 +1,6 @@
 class Game{
     constructor(canvas, global){
+        self = this;
         this.global = global;
         this.canvas = canvas;
         this.cards = [];
@@ -9,7 +10,19 @@ class Game{
 
     handleNetwork(socket) {
         socket.on('playerJoined', function (playerName) {
-            this.getCardsFromServer(socket);
+
+        });
+
+        socket.on('setInitData', function () {
+            socket.emit('getAllCards');
+            socket.on('setAllCards', function (data) {
+
+                self.cards = [new Card(data[0].x, data[0].y, data[0].id, data[0].type)];
+
+                for(let i = 1; i < data.length; i++){
+                    self.cards.push(new Card(data[i].x, data[i].y, data[i].id, data[i].type));
+                }
+            });
         });
         // This is where you receive all socket messages
     };
@@ -20,19 +33,12 @@ class Game{
 
     handleGraphics(canvas) {
         // This is where you draw everything
-
+        this.drawCards();
     };
 
     drawCards(){
         for(let i in this.cards){
             this.cards[i].draw();
         }
-    }
-
-    getCardsFromServer(socket){
-        socket.emit('getAllCards');
-        socket.on('setAllCards', function (data) {
-            console.log(data);
-        });
     }
 }

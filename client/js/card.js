@@ -27,7 +27,6 @@ class Card{
     draw(){
         let x = this.x * this.width + c.width/2 - this.width/2;
         let y = this.y * this.width + c.height/2 - this.width/2;
-        console.log(x + " " + y);
         this.drawRect(x, y, this.width, this.width, this.color[this.type]);
     }
 
