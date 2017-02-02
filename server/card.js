@@ -1,8 +1,8 @@
 module.exports = class Card{
     constructor(x, y, id, type){
-        this. xPos = x;
-        this.yPos = y;
-        this.id = id;
+        this.xPosGrid = x;
+        this.yPosGrid = y;
+        this.cardId = id;
         this.type = type;
     }
 };

@@ -1,42 +1,41 @@
 class Card extends createjs.Container{
-    constructor(xPos, yPos, id, type){
+    constructor(xPosGrid, yPosGrid, id, type){
         super();
 
-        this.draw();
-        this.xPos = xPos;
-        this.yPos = yPos;
-        this.id = id;
+        this.xPosGrid = xPosGrid;
+        this.yPosGrid = yPosGrid;
+        this.cardId = id;
         this.type = type;
         this.width = 100;
         this.color = ["grey", "green"];
 
+        this.refreshPosition();
         this.init();
     }
 
     init(){
-        this.rect = new createjs.Shape();
-        this.rect.graphics.beginFill(this.color[this.type]).drawRect(0, 0, this.width, this.width);
+        let rect = new createjs.Shape();
+        rect.graphics.beginFill(this.color[this.type]).drawRect(0, 0, this.width, this.width);
 
-        this.rect.addEventListener("mousedown", function (event) {
+
+        rect.addEventListener("mousedown", function (event) {
             console.log(event);
             if(event.nativeEvent.button == 0){
                 //left button
-                console.log(this.id);
             }else{
                 //right or middle button
-                console.log(this.id);
             }
         }.bind(this));
 
-        stage.addChild(this.rect);
+        this.addChild(rect);
     }
 
     getXPos(){
-        return this.xPos;
+        return this.xPosGrid;
     }
 
     getYPos(){
-        return this.yPos;
+        return this.yPosGrid;
     }
 
     getType(){
@@ -47,11 +46,11 @@ class Card extends createjs.Container{
         return this.width;
     }
 
-    draw(){
-        let x = this.xPos * this.width + c.width/2 - this.width/2;
-        let y = this.yPos * this.width + c.height/2 - this.width/2;
-        this.x = x;
-        this.y = y;
+    refreshPosition(){
+        let x = this.xPosGrid * this.width + screenWidth/2 - this.width/2;
+        let y = this.yPosGrid * this.width + screenHeight/2 - this.width/2;
+        this.xPos = x;
+        this.yPos = y;
     }
 }
 createjs.promote(Card, "Container");

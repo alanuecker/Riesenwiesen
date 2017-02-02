@@ -7,13 +7,12 @@ let screenHeight = window.innerHeight;
 
 //let canvas = new fabric.Canvas('canvas');
 let stage = new createjs.Stage("cvs");
-stage.autoClear = true;
+let content = new createjs.Container();
+stage.addChild(content);
 let c = document.getElementById('cvs');
 c.addEventListener('contextmenu', event => event.preventDefault());
 c.width = screenWidth;
 c.height = screenHeight;
-
-let KEY_ENTER = 13;
 
 let global = {
     // Keys and other mathematical constants
@@ -28,19 +27,6 @@ let global = {
     borderDraw: false,
     spin: -Math.PI,
     mobile: false,
-
-    // Canvas
-    screenWidth: window.innerWidth,
-    screenHeight: window.innerHeight,
-    gameWidth: 0,
-    gameHeight: 0,
-    xoffset: -0,
-    yoffset: -0,
-    gameStart: false,
-    disconnected: false,
-    continuity: false,
-    backgroundColor: '#f2fbff',
-    lineColor: '#000000',
 };
 
 let game = new Game(global);
@@ -79,7 +65,7 @@ window.onload = function() {
     playerNameInput.addEventListener('keypress', function (e) {
         let key = e.which || e.keyCode;
 
-        if (key === KEY_ENTER) {
+        if (key === global.KEY_ENTER) {
             if (validNick()) {
                 startGame();
             } else {

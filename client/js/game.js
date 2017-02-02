@@ -1,7 +1,6 @@
 class Game{
-    constructor(global){
+    constructor(){
         self = this;
-        this.global = global;
         this.cards = [];
 
         this.drawCards();
@@ -16,10 +15,14 @@ class Game{
             socket.emit('getAllCards');
             socket.on('setAllCards', function (data) {
 
-                self.cards = [new Card(data[0].xPos, data[0].yPos, data[0].id, data[0].type)];
+                let card = new Card(data[0].xPosGrid, data[0].yPosGrid, data[0].cardId, data[0].type);
+                self.cards = [card];
+                content.addChild(card);
 
                 for(let i = 1; i < data.length; i++){
-                    self.cards.push(new Card(data[i].xPos, data[i].yPos, data[i].id, data[i].type));
+                    card = new Card(data[i].xPosGrid, data[i].yPosGrid, data[i].cardId, data[i].type);
+                    self.cards.push(card);
+                    content.addChild(card);
                 }
             });
         });
@@ -31,14 +34,14 @@ class Game{
     };
 
     handleGraphics() {
-        // This is where you draw everything
+        // This is where you refreshPosition everything
         this.drawCards();
         stage.update();
     };
 
     drawCards(){
         for(let i in this.cards){
-            this.cards[i].draw();
+            this.cards[i].refreshPosition();
         }
     }
 }
