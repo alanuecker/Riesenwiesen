@@ -29,7 +29,7 @@ let global = {
     mobile: false,
 };
 
-let game = new Game(global);
+let game = new Game(socket);
 
 function startGame() {
     playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, '');

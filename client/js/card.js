@@ -22,6 +22,7 @@ class Card extends createjs.Container{
             console.log(event);
             if(event.nativeEvent.button == 0){
                 //left button
+                game.sendSelectedCard(this.cardId);
             }else{
                 //right or middle button
             }
@@ -30,11 +31,23 @@ class Card extends createjs.Container{
         this.addChild(rect);
     }
 
-    getXPos(){
+    setXPosGrid(value){
+        this.xPosGrid = value;
+    }
+
+    setYPosGrid(value){
+        this.yPosGrid = value;
+    }
+
+    setType(value){
+        this.type = value;
+    }
+
+    getXPosGrid(){
         return this.xPosGrid;
     }
 
-    getYPos(){
+    getYPosGrid(){
         return this.yPosGrid;
     }
 
@@ -45,6 +58,11 @@ class Card extends createjs.Container{
     getWidth(){
         return this.width;
     }
+
+    getCardId(){
+        return this.cardId;
+    }
+
 
     refreshPosition(){
         let x = this.xPosGrid * this.width + screenWidth/2 - this.width/2;
