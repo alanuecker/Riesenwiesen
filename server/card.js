@@ -5,4 +5,8 @@ module.exports = class Card{
         this.cardId = id;
         this.type = type;
     }
+
+    getType(){
+        return this.type;
+    }
 };

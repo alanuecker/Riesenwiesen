@@ -28,6 +28,8 @@ class Game{
 
         this.socket.on('updateCard', function (data) {
             self.cards[data.cardId].setType(data.type);
+            console.log(data);
+            self.drawCards();
         });
 
         this.socket.on('addCard', function (data) {

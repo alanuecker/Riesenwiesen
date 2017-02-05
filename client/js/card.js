@@ -15,7 +15,8 @@ class Card extends createjs.Container{
 
     init(){
         let rect = new createjs.Shape();
-        rect.graphics.beginFill(this.color[this.type]).drawRect(0, 0, this.width, this.width);
+        this.rectCommand = rect.graphics.beginFill(this.color[this.type]).command;
+        rect.graphics.drawRect(0, 0, this.width, this.width);
 
 
         rect.addEventListener("mousedown", function (event) {
@@ -41,6 +42,7 @@ class Card extends createjs.Container{
 
     setType(value){
         this.type = value;
+        this.rectCommand.style = this.color[this.type];
     }
 
     getXPosGrid(){
