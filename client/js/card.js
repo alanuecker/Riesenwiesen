@@ -20,7 +20,6 @@ class Card extends createjs.Container{
 
 
         rect.addEventListener("mousedown", function (event) {
-            console.log(event);
             if(event.nativeEvent.button == 0){
                 //left button
                 game.sendSelectedCard(this.cardId);
@@ -67,8 +66,8 @@ class Card extends createjs.Container{
 
 
     refreshPosition(){
-        let x = this.xPosGrid * this.width + screenWidth/2 - this.width/2;
-        let y = this.yPosGrid * this.width + screenHeight/2 - this.width/2;
+        let x = this.xPosGrid * this.width + screenWidth/2 - this.width/2 + global.offsetX;
+        let y = this.yPosGrid * this.width + screenHeight/2 - this.width/2 + global.offsetY;
         this.xPos = x;
         this.yPos = y;
     }

@@ -1,9 +1,33 @@
-class Game{
+class Game extends createjs.Container{
     constructor(socket){
+        super();
+
         self = this;
         this.cards = [];
-
+        this.field = new createjs.Container();
         this.drawCards();
+
+        content.addChild(this.field);
+
+        function keyPressed(event) {
+
+            switch(event.keyCode){
+                case global.KEY_RIGHT:
+                    global.offsetX -= 100;
+                    break;
+                case global.KEY_LEFT:
+                    global.offsetX += 100;
+                    break;
+                case global.KEY_UP:
+                    global.offsetY += 100;
+                    break;
+                case global.KEY_DOWN:
+                    global.offsetY -= 100;
+                    break;
+            }
+        }
+
+        document.onkeydown = keyPressed;
     };
 
     handleNetwork(socket) {
@@ -28,7 +52,6 @@ class Game{
 
         this.socket.on('updateCard', function (data) {
             self.cards[data.cardId].setType(data.type);
-            console.log(data);
             self.drawCards();
         });
 
@@ -39,6 +62,7 @@ class Game{
 
     handleLogic() {
         // This is where you update your game logic
+
     };
 
     handleGraphics() {
@@ -56,7 +80,6 @@ class Game{
     //player selected a card and send that data to server
     sendSelectedCard(id){
         this.socket.emit('setSelectedCard', id);
-        console.log("emit " + id);
     }
 
     //player confirmed card placement
@@ -68,6 +91,7 @@ class Game{
     addCard(xPosGrid, yPosGrid, cardId, type){
         let card = new Card(xPosGrid, yPosGrid, cardId, type);
         this.cards.push(card);
-        content.addChild(card);
+        this.field.addChild(card);
     }
 }
+createjs.promote(Game, "Container");

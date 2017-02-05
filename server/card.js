@@ -6,7 +6,19 @@ module.exports = class Card{
         this.type = type;
     }
 
+    setType(value){
+        this.type = value;
+    }
+
     getType(){
         return this.type;
+    }
+
+    getXPosGrid(){
+        return this.xPosGrid;
+    }
+
+    getYPosGrid(){
+        return this.yPosGrid;
     }
 };

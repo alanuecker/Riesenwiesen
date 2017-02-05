@@ -15,18 +15,21 @@ c.width = screenWidth;
 c.height = screenHeight;
 
 let global = {
+    offsetX: 0,
+    offsetY: 0,
+
     // Keys and other mathematical constants
     KEY_ESC: 27,
     KEY_ENTER: 13,
     KEY_CHAT: 13,
     KEY_SPLIT: 32,
-    KEY_LEFT: 37,
-    KEY_UP: 38,
-    KEY_RIGHT: 39,
-    KEY_DOWN: 40,
+    KEY_LEFT: 65,
+    KEY_UP: 87,
+    KEY_RIGHT: 68,
+    KEY_DOWN: 83,
     borderDraw: false,
     spin: -Math.PI,
-    mobile: false,
+    mobile: false
 };
 
 let game = new Game(socket);

@@ -47,7 +47,12 @@ module.exports = class Field{
     }
 
     setCardType(id){
+        if(this.cards[id].type == 0)
+            this.fillSurroundingCards(this.cards[id].getXPosGrid(), this.cards[id].getYPosGrid());
         this.cards[id].type++;
+        if(this.cards[id].type > 1)
+            this.cards[id].type = 1;
+
         this.server.sendUpdateCard(this.cards[id]);
     }
 
@@ -106,5 +111,24 @@ module.exports = class Field{
         surroundingTypes.push(this.getPositionType(this.getPositionID(x + 1, y - 1)));
 
         return surroundingTypes.filter(function (n) {return n >= 0});
+    }
+
+    fillSurroundingCards(x, y){
+        if(this.getPositionType(this.getPositionID(x + 1, y)) < 0){
+            this.setPosition(x + 1, y, 0);
+            this.server.sendAddCard(this.cards[this.cards.length - 1]);
+        }
+        if(this.getPositionType(this.getPositionID(x - 1, y)) < 0){
+            this.setPosition(x - 1, y, 0);
+            this.server.sendAddCard(this.cards[this.cards.length - 1]);
+        }
+        if(this.getPositionType(this.getPositionID(x, y + 1)) < 0){
+            this.setPosition(x, y + 1, 0);
+            this.server.sendAddCard(this.cards[this.cards.length - 1]);
+        }
+        if(this.getPositionType(this.getPositionID(x , y - 1)) < 0){
+            this.setPosition(x, y - 1, 0);
+            this.server.sendAddCard(this.cards[this.cards.length - 1]);
+        }
     }
 };
