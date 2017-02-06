@@ -93,8 +93,14 @@ canvas {
 	margin-top: 0;
 }
 
-#startMenu .input-error {
-  color : red;
-  display: none;
-  font-size : 12px;
+#startMenu .input-error{
+	color : red;
+	display: none;
+	font-size : 12px;
+}
+
+#startMenu .input-name-double{
+	color : red;
+	display: none;
+	font-size : 12px;
 }

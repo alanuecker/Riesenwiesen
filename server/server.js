@@ -6,12 +6,21 @@ let io      = require('socket.io')(http);
 let config  = require('./config.json');
 
 let Field = require('./field.js');
-let Card = require('./card.js');
+let PlayerManager = require('./playermanager.js');
 
 class Server{
     constructor(){
+        let self = this;
+
+        this.playerManager = new PlayerManager(this);
+
         io.on('connection', function (socket) {
             console.log("Somebody connected!");
+
+            socket.on('setPlayerName', function (playerName) {
+                self.playerManager.checkPlayerName(playerName, socket);
+            });
+
             //send connected player field data
             socket.emit('setAllCards', field.getCards());
 
@@ -32,10 +41,13 @@ class Server{
         io.emit('addCard', card);
     }
 
-
     //update a card for all players
     sendUpdateCard(card) {
         io.emit('updateCard', card);
+    }
+
+    sendPlayerNameValid(value, socket){
+        socket.emit('playerValid', value);
     }
 }
 

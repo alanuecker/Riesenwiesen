@@ -1,6 +1,8 @@
 let playerName;
 let playerNameInput = document.getElementById('playerNameInput');
-let socket;
+let nickDoubleText = document.querySelector('#startMenu .input-name-double');
+let nickErrorText = document.querySelector('#startMenu .input-error');
+let socket = io();
 
 let screenWidth = window.innerWidth;
 let screenHeight = window.innerHeight;
@@ -33,35 +35,47 @@ let global = {
 };
 
 let game = new Game(socket);
+SetupSocket();
+
 
 function startGame() {
     playerName = playerNameInput.value.replace(/(<([^>]+)>)/ig, '');
     document.getElementById('gameAreaWrapper').style.display = 'block';
     document.getElementById('startMenuWrapper').style.display = 'none';
-    socket = io();
-    SetupSocket(socket);
     animloop();
 }
 
 // check if nick is valid alphanumeric characters (and underscores)
 function validNick() {
+    console.log("valid nick");
+
     let regex = /^\w*$/;
     return regex.exec(playerNameInput.value) !== null;
+}
+
+function checkedNick(value) {
+    console.log("check nick " + value);
+    if(value)
+        startGame();
+    else{
+        nickDoubleText.style.display = 'inline';
+        nickErrorText.style.display = 'none';
+    }
 }
 
 window.onload = function() {
     'use strict';
 
-    let btn = document.getElementById('startButton'),
-        nickErrorText = document.querySelector('#startMenu .input-error');
+    let btn = document.getElementById('startButton');
 
     btn.onclick = function () {
 
         // check if the nick is valid
         if (validNick()) {
-            startGame();
+            game.sendPlayerName(playerNameInput.value);
         } else {
             nickErrorText.style.display = 'inline';
+            nickDoubleText.style.display = 'none';
         }
     };
 
@@ -70,16 +84,17 @@ window.onload = function() {
 
         if (key === global.KEY_ENTER) {
             if (validNick()) {
-                startGame();
+                game.sendPlayerName(playerNameInput.value);
             } else {
                 nickErrorText.style.display = 'inline';
+                nickDoubleText.style.display = 'none';
             }
         }
     });
 };
 
-function SetupSocket(socket) {
-  game.handleNetwork(socket);
+function SetupSocket() {
+  game.handleNetwork();
 }
 
 window.requestAnimFrame = (function(){

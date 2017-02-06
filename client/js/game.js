@@ -3,6 +3,7 @@ class Game extends createjs.Container{
         super();
 
         self = this;
+        this.socket = socket;
         this.cards = [];
         this.field = new createjs.Container();
         this.drawCards();
@@ -30,17 +31,20 @@ class Game extends createjs.Container{
         document.onkeydown = keyPressed;
     };
 
-    handleNetwork(socket) {
-        this.socket = socket;
-
+    handleNetwork() {
+        this.socket.on('playerValid', function (playerValid) {
+            console.log("player name valid " + playerValid);
+            checkedNick(playerValid);
+        });
+        
         // This is where you receive all socket messages
-        this.socket.on('playerJoined', function (playerName) {
+        this.socket.on('playerJoinedGame', function (playerName) {
 
         });
 
         //get all cards from sever and create them
-        self.socket.on('setAllCards', function (data) {
-
+        this.socket.on('setAllCards', function (data) {
+            self.cards = [];
             let card = new Card(data[0].xPosGrid, data[0].yPosGrid, data[0].cardId, data[0].type);
             self.cards = [card];
             content.addChild(card);
@@ -85,6 +89,11 @@ class Game extends createjs.Container{
     //player confirmed card placement
     sendSetCard(id){
         this.socket.emit('setCard', id);
+    }
+
+    sendPlayerName(playerName){
+        console.log("send player name " + playerName);
+        this.socket.emit('setPlayerName', playerName);
     }
 
     //create a new card and add it
