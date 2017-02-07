@@ -15,10 +15,12 @@ class Server{
         this.playerManager = new PlayerManager(this);
 
         io.on('connection', function (socket) {
+            let socketPlayerName = "";
             console.log("Somebody connected!");
 
             socket.on('setPlayerName', function (playerName) {
                 self.playerManager.checkPlayerName(playerName, socket);
+                socketPlayerName = playerName;
             });
 
             //send connected player field data
@@ -27,6 +29,11 @@ class Server{
             //player selected a card
             socket.on('setSelectedCard', function (id) {
                 field.setCardType(id);
+            });
+
+            //player left the game
+            socket.on('disconnect', function () {
+                self.playerManager.playerLeft(socketPlayerName);
             });
         });
 
