@@ -6,9 +6,10 @@ class Game extends createjs.Container{
         this.socket = socket;
         this.cards = [];
         this.field = new createjs.Container();
+        this.playerList = new PlayerList();
         this.drawCards();
 
-        content.addChild(this.field);
+        content.addChild(this.field, this.playerList);
 
         function keyPressed(event) {
 
@@ -38,8 +39,12 @@ class Game extends createjs.Container{
         });
         
         // This is where you receive all socket messages
-        this.socket.on('playerJoinedGame', function (playerName) {
+        this.socket.on('playerJoinedGame', function (data) {
+            self.playerList.addPlayer(data.playerName, data.playerScore);
+        });
 
+        this.socket.on('playerLeftGame', function (playerName) {
+            self.playerList.removePlayer(playerName);
         });
 
         //get all cards from sever and create them

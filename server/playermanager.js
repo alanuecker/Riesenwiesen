@@ -8,54 +8,87 @@ module.exports = class PlayerManager{
     }
 
     addNewPlayer(playerName){
-        if(this.playerList.length > 0){
-            console.log("not first");
-            this.playerList.push(new Player(playerName, this.playerList.length));
-            console.log(this.playerList.length);
-            this.playerActive.push(this.playerList[this.playerList.length--]);
-        }else{
-            console.log("first");
-            this.playerList.push(new Player(playerName, this.playerList.length));
-            this.playerActive = [this.playerList[0]];
+        this.playerList.push(new Player(playerName, this.playerList.length));
+        this.playerActive.push(this.playerList[this.playerList.length - 1]);
+
+        for (let obj of this.playerActive) {
+            console.log("added player " + obj);
         }
     }
 
     playerLeft(playerName){
-        this.playerActive = this.playerActive.filter(function (n) {return n.getPlayerName() !== playerName;})
+        console.log("player left " + playerName + " active players " + this.playerActive.length);
+        if(this.playerActive.length > 1)
+            this.playerActive = this.playerActive.filter(function (n) {return n.getPlayerName() !== playerName;});
+        else
+            this.playerActive.pop();
+
+        this.setPlayerActiveValue(playerName, false);
+
+        for (let obj of this.playerActive) {
+            console.log("playerLeft " + obj);
+        }
     }
 
     playerJoined(playerName){
         console.log("player joined");
-        for(let i in this.playerList){
-            if(this.playerList[i].getPlayerName() === playerName){
-                if(this.playerActive.length > 0){
-                    this.playerActive.push(this.playerList[i]);
-                }else{
-                    this.playerActive = [this.playerList[i]];
-                }
+        for(let player of this.playerList){
+            if(player.getPlayerName() === playerName){
+                player.setPlayerActive(true);
+                this.playerActive.push(player);
             }
+        }
+
+        for (let obj of this.playerActive) {
+            console.log("playerJoined " + obj);
         }
     }
 
     checkPlayerName(playerName, socket){
         if(this.playerList.length == 0){
             this.addNewPlayer(playerName);
-            socket.emit('playerValid', 'true');
+            this.gameServer.sendPlayerNameValid(true, socket);
             console.log('added first player');
         }else {
+            let playerNotInList = false;
+
             for(let i in this.playerList){
-                if(playerName === this.playerList[i].getPlayerName() && !this.playerList[i].getPlayerActive()){
-                    this.playerJoined(playerName);
-                    this.gameServer.sendPlayerNameValid(true, socket);
-                    console.log("player name in list and not active");
-                }else if(playerName === this.playerList[i].getPlayerName() && this.playerList[i].getPlayerActive()){
-                    this.gameServer.sendPlayerNameValid(false, socket);
-                    console.log('player name in list but active');
+                console.log("player names in list: " + this.playerList[i].getPlayerName());
+
+                if(playerName == this.playerList[i].getPlayerName()){
+                    if(!this.playerList[i].getPlayerActive()){
+                        this.playerJoined(playerName);
+                        this.gameServer.sendPlayerNameValid(true, socket);
+                        console.log("player name in list and not active " + playerName);
+                        playerNotInList = false;
+                    }
+                    else{
+                        this.gameServer.sendPlayerNameValid(false, socket);
+                        console.log('player name in list but active');
+                        playerNotInList = false;
+                    }
                 }else{
-                    this.addNewPlayer(playerName);
-                    this.gameServer.sendPlayerNameValid(true, socket);
-                    console.log('player not in list');
+                    playerNotInList = true;
                 }
+            }
+
+            if(playerNotInList){
+                this.addNewPlayer(playerName);
+                this.gameServer.sendPlayerNameValid(true, socket);
+                console.log('player not in list ' + playerName);
+            }
+        }
+    }
+
+    getLastPlayer(){
+        if(this.playerActive.length > 0)
+            return this.playerActive[this.playerActive.length - 1];
+    }
+
+    setPlayerActiveValue(playerName, value){
+        for (let player of this.playerList) {
+            if(playerName === player.getPlayerName()){
+                player.setPlayerActive(value);
             }
         }
     }

@@ -34,6 +34,7 @@ class Server{
             //player left the game
             socket.on('disconnect', function () {
                 self.playerManager.playerLeft(socketPlayerName);
+                io.emit('playerLeftGame', socketPlayerName);
             });
         });
 
@@ -55,6 +56,9 @@ class Server{
 
     sendPlayerNameValid(value, socket){
         socket.emit('playerValid', value);
+        if(value == true){
+            io.emit('playerJoinedGame', this.playerManager.getLastPlayer());
+        }
     }
 }
 
