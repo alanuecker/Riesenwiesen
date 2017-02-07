@@ -171,3 +171,9 @@ bin
 /node_modules/type-is/
 /node_modules/type-check/
 /node_modules/
+/node_modules/express/
+/node_modules/socket.io/
+/node_modules/socket.io-parser/
+/node_modules/socket-io-server/
+/node_modules/socket.io-client/
+/node_modules/socket.io-adapter/
