@@ -16,6 +16,8 @@ class Server{
 
         io.on('connection', function (socket) {
             let socketPlayerName = "";
+            let socketSelectedCard = 0;
+
             console.log("Somebody connected!");
 
             socket.on('setPlayerName', function (playerName) {
@@ -26,9 +28,20 @@ class Server{
             //send connected player field data
             socket.emit('setAllCards', field.getCards());
 
-            //player selected a card
-            socket.on('setSelectedCard', function (id) {
+            //player changed a cards type
+            socket.on('changeCardType', function (id) {
                 field.setCardType(id);
+                socketSelectedCard = id;
+            });
+
+            //player rotated a card
+            socket.on('changeCardRotation', function (id) {
+                field.setCardRotation(id);
+            });
+
+            //player applied a card
+            socket.on('applyCard', function () {
+                field.checkPlacement(socketSelectedCard, socket);
             });
 
             //player left the game
@@ -56,9 +69,23 @@ class Server{
 
     sendPlayerNameValid(value, socket){
         socket.emit('playerValid', value);
+
         if(value == true){
+            //send active player to new client
+            for(let i = 0; i < this.playerManager.getPlayerActive().length - 1; i++){
+                socket.emit('playerJoinedGame', this.playerManager.getPlayerActive()[i]);
+            }
+            //tell all clients that new player has joined the game
             io.emit('playerJoinedGame', this.playerManager.getLastPlayer());
         }
+    }
+
+    sendUpdatePlayer(player){
+        io.emit('updatePlayer', player);
+    }
+
+    sendCardValid(socket){
+        socket.emit('cardValid');
     }
 }
 

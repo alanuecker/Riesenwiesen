@@ -26,6 +26,14 @@ class PlayerList extends createjs.Container{
             this.playerList[i].movePosition(i * 25);
         }
     }
+
+    setPlayerScore(data){
+        for(let player of this.playerList){
+            if(player.getPlayerName() === data.playerName){
+                player.setPlayerScore(data.playerScore);
+            }
+        }
+    }
 }
 createjs.promote(PlayerList, "Container");
 
@@ -33,22 +41,25 @@ class PlayerElement extends createjs.Container{
     constructor(playerName, playerScore, position){
         super();
 
+        this.spacing = 15;
+
         this.playerName = playerName;
         this.playerScore = playerScore;
 
         this.playerText = new createjs.Text(this.playerName, "18px Arial", "black");
-        this.playerText.yPos = position;
+        this.playerText.yPos = position + this.spacing;
+        this.playerText.xPos = 15;
 
         this.scoreText = new createjs.Text(this.playerScore, "18px Arial", "black");
-        this.scoreText.yPos = position;
-        this.scoreText.xPos = 100;
+        this.scoreText.yPos = position + this.spacing;
+        this.scoreText.xPos = 115;
 
         this.addChild(this.playerText, this.scoreText);
     }
 
     movePosition(position){
-        this.playerText.yPos = position;
-        this.scoreText.yPos = position;
+        this.playerText.yPos = position + this.spacing;
+        this.scoreText.yPos = position + this.spacing;
     }
 
     getPlayerName(){
@@ -65,7 +76,70 @@ class PlayerElement extends createjs.Container{
 
     setPlayerScore(value){
         this.playerScore = value;
-        this.scoreText = value;
+        this.scoreText.text = value;
     }
 }
 createjs.promote(PlayerElement, "Container");
+
+class Button extends createjs.Container{
+    constructor(width, height, xPos, yPos, background, backgroundClick, backgroundHover, frameColor, text, textSize, textColor, handleClick) {
+        super();
+
+        this.width = width;
+        this.height = height;
+        this.background = background;
+        this.backgroundClick = backgroundClick;
+        this.backgroundHover = backgroundHover;
+        this.frameColor = frameColor;
+        this.text = text;
+        this.textColor = textColor;
+        this.textSize = textSize;
+        this.padding = 3;
+        this.handleClick = handleClick;
+
+        //position
+        this.xPos = xPos;
+        this.yPos = yPos;
+
+        //setup
+        this.setup();
+    };
+
+    setup() {
+        //backgroundElement
+        this.backgroundElement = new createjs.Shape();
+        this.backgroundElement.graphics.beginFill(this.background).drawRect(0, 0, this.width, this.height);
+        //frame
+        this.frame = new createjs.Shape();
+        this.frame.graphics.setStrokeStyle(2).beginStroke(this.frameColor).drawRect(-this.padding/2, -this.padding/2, this.width+this.padding, this.height+this.padding).endStroke();
+        //text
+        this.textElement = new createjs.Text(this.text, this.textSize + "px Arial", this.textColor);
+        //center text
+        let textBounds = this.textElement.getBounds();
+        this.textElement.xPos = this.width/2 - textBounds.width/2;
+        this.textElement.yPos = this.height/2 - textBounds.height/2;
+
+        //event on click
+        let handleClickEvent = function () {
+            this.backgroundElement.graphics.beginFill(this.backgroundClick).drawRect(0, 0, this.width, this.height);
+            this.handleClick();
+            this.backgroundElement.graphics.beginFill(this.background).drawRect(0, 0, this.width, this.height);
+        };
+        //event on hover
+        let handleOverEvent = function (evt) {
+            if(evt.type == "mouseover"){
+                this.backgroundElement.graphics.beginFill(this.backgroundHover).drawRect(0, 0, this.width, this.height);
+            }else{
+                this.backgroundElement.graphics.beginFill(this.background).drawRect(0, 0, this.width, this.height);
+            }
+        };
+
+        this.backgroundElement.addEventListener("click", handleClickEvent.bind(this));
+        this.backgroundElement.addEventListener("mouseover", handleOverEvent.bind(this));
+        this.backgroundElement.addEventListener("mouseout", handleOverEvent.bind(this));
+
+        //add childs
+        this.addChild(this.backgroundElement, this.frame, this.textElement);
+    };
+}
+createjs.promote(Button, "Container");

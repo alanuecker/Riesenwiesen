@@ -5,6 +5,13 @@ module.exports = class Player{
         this.playerActive = true;
         this.playerScore = 0;
         this.playerId = playerId;
+
+        this.selectedCardId = 0;
+        this.cardRotation = 0;
+    }
+
+    addPoint(value){
+        this.playerScore = this.playerScore + value;
     }
 
     getPlayerId() {

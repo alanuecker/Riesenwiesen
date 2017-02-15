@@ -9,8 +9,10 @@ class Game extends createjs.Container{
         this.playerList = new PlayerList();
         this.drawCards();
 
-        content.addChild(this.field, this.playerList);
+        this.init();
+    };
 
+    init(){
         function keyPressed(event) {
 
             switch(event.keyCode){
@@ -30,7 +32,11 @@ class Game extends createjs.Container{
         }
 
         document.onkeydown = keyPressed;
-    };
+
+        let applyButton = new Button(50, 25, 15, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Apply", 15, "black", function () {self.socket.emit('applyCard');});
+
+        content.addChild(this.field, this.playerList, applyButton);
+    }
 
     handleNetwork() {
         this.socket.on('playerValid', function (playerValid) {
@@ -50,22 +56,32 @@ class Game extends createjs.Container{
         //get all cards from sever and create them
         this.socket.on('setAllCards', function (data) {
             self.cards = [];
-            let card = new Card(data[0].xPosGrid, data[0].yPosGrid, data[0].cardId, data[0].type);
+            let card = new Card(data[0].xPosGrid, data[0].yPosGrid, data[0].cardId, data[0].cardType, data[0].cardRotation);
             self.cards = [card];
             content.addChild(card);
 
             for(let i = 1; i < data.length; i++){
-                self.addCard(data[i].xPosGrid, data[i].yPosGrid, data[i].cardId, data[i].type);
+                self.addCard(data[i].xPosGrid, data[i].yPosGrid, data[i].cardId, data[i].cardType, data[i].cardRotation);
             }
         });
 
         this.socket.on('updateCard', function (data) {
-            self.cards[data.cardId].setType(data.type);
+            self.cards[data.cardId].setType(data.cardType);
+            self.cards[data.cardId].setRotation(data.cardRotation);
+            self.cards[data.cardId].setCardPlaced(data.cardPlaced);
             self.drawCards();
         });
 
+        this.socket.on('updatePlayer', function (data) {
+            self.playerList.setPlayerScore(data);
+        });
+
         this.socket.on('addCard', function (data) {
-            self.addCard(data.xPosGrid, data.yPosGrid, data.cardId, data.type);
+            self.addCard(data.xPosGrid, data.yPosGrid, data.cardId, data.cardType, data.cardRotation);
+        });
+
+        this.socket.on('cardValid', function () {
+           console.log("card Valid");
         });
     };
 
@@ -88,12 +104,7 @@ class Game extends createjs.Container{
 
     //player selected a card and send that data to server
     sendSelectedCard(id){
-        this.socket.emit('setSelectedCard', id);
-    }
-
-    //player confirmed card placement
-    sendSetCard(id){
-        this.socket.emit('setCard', id);
+        this.socket.emit('changeCardType', id);
     }
 
     sendPlayerName(playerName){
@@ -101,9 +112,13 @@ class Game extends createjs.Container{
         this.socket.emit('setPlayerName', playerName);
     }
 
+    sendRotateCard(id){
+        this.socket.emit('changeCardRotation', id);
+    }
+
     //create a new card and add it
-    addCard(xPosGrid, yPosGrid, cardId, type){
-        let card = new Card(xPosGrid, yPosGrid, cardId, type);
+    addCard(xPosGrid, yPosGrid, cardId, type, rotation){
+        let card = new Card(xPosGrid, yPosGrid, cardId, type, rotation);
         this.cards.push(card);
         this.field.addChild(card);
     }
