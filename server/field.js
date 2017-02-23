@@ -99,7 +99,7 @@ module.exports = class Field{
         return this.cards;
     }
 
-
+    //change the type of a card by 1
     setCardType(id){
         if(this.cards[id].getCardPlaced())
             return;
@@ -111,6 +111,7 @@ module.exports = class Field{
         this.gameServer.sendUpdateCard(this.cards[id]);
     }
 
+    //change the rotation of a card by 1
     setCardRotation(id){
         if(this.cards[id].getCardPlaced())
             return;
@@ -136,8 +137,6 @@ module.exports = class Field{
         surroundingCards.push(this.cards[this.getPositionID(x + 1, y)]);
         surroundingCards.push(this.cards[this.getPositionID(x, y - 1)]);
         surroundingCards.push(this.cards[this.getPositionID(x - 1, y)]);
-
-        console.log("getsurrounding for " + x + " " + y + " " + surroundingCards[1]);
 
         return surroundingCards;
     }
@@ -204,7 +203,6 @@ module.exports = class Field{
     //apply rotation to position in array
     sideArrayPosition(rotation, position){
 
-        console.log("rotation " + rotation + " position " + position);
         switch(rotation){
             case 0:
                 return position;
@@ -213,7 +211,6 @@ module.exports = class Field{
                 position -= 1;
                 if(position < 0)
                     position = 3;
-                console.log("position in rotated array " + position);
                 return position;
                 break;
             case 2:
@@ -231,31 +228,27 @@ module.exports = class Field{
         }
     }
 
+    //check if the card can be placed
     checkPlacement(cardID, socket){
-        console.log("------------------------------------");
 
+        if(cardID <= 0)
+            return;
 
         let cardValid = true;
         let card = this.cards[cardID];
+        //get the surrounding cards
         let surrondingCards = this.getSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
 
-        console.log("clog length " + surrondingCards.length);
-
-        for(let i in surrondingCards){
-            console.log(surrondingCards[i]);
-        }
-        console.log("----------------");
-
+        //go through all surrounding cards and check if their intersecting sides are free or the right card type is selected
         for(let i in surrondingCards){
             if(surrondingCards[i] != undefined && surrondingCards[i].getType() != 0){
                 if(!this.checkSides(i, card, surrondingCards[i]))
                     cardValid = false;
-                console.log("next card " + cardValid);
             }
         }
 
+        //card can be placed
         if(cardValid){
-            console.log("card is valid");
             card.setCardPlaced(true);
 
             this.gameServer.sendCardValid(socket);
@@ -269,23 +262,20 @@ module.exports = class Field{
         }
     }
 
+    //check if the side on cardA and the intersecting side on cardB have the same type
     checkSides(sideA, cardA, cardB){
         let sideB = 0;
         sideA = parseInt(sideA);
+        //find the intersecting side on the other card
         if(sideA < 2)
             sideB = (sideA + 2);
         else
             sideB = (sideA - 2);
 
-        console.log("side A " + this.cardSides.cards[cardA.getType()].sides[this.sideArrayPosition(cardA.getRotation(), sideA)] + " type " + cardA.getType() + " sidea " + sideA);
-        console.log("side B " + this.cardSides.cards[cardB.getType()].sides[this.sideArrayPosition(cardB.getRotation(), sideB)] + " type " + cardB.getType() + " sideb " + sideB);
-
-        if(this.cardSides.cards[cardA.getType()].sides[this.sideArrayPosition(cardA.getRotation(), sideA)] === this.cardSides.cards[cardB.getType()].sides[this.sideArrayPosition(cardB.getRotation(), sideB)])
-            return true;
-        else
-            return false;
+        return this.cardSides.cards[cardA.getType()].sides[this.sideArrayPosition(cardA.getRotation(), sideA)] === this.cardSides.cards[cardB.getType()].sides[this.sideArrayPosition(cardB.getRotation(), sideB)];
     }
 
+    //if the card is placed, mark the side in the card as 1
     placeSides(sideA, cardA, cardB){
         let sideB = 0;
         sideA = parseInt(sideA);

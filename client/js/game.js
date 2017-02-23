@@ -34,8 +34,10 @@ class Game extends createjs.Container{
         document.onkeydown = keyPressed;
 
         let applyButton = new Button(50, 25, 15, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Apply", 15, "black", function () {self.socket.emit('applyCard');});
+        let resetButton = new Button(50, 25, 100, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Reset", 15, "black", function () {self.socket.emit('resetCard');});
+        let newCardButton = new Button(50, 25, 185, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "New Card", 15, "black", function () {self.socket.emit('newCard');});
 
-        content.addChild(this.field, this.playerList, applyButton);
+        content.addChild(this.field, this.playerList, applyButton, resetButton, newCardButton);
     }
 
     handleNetwork() {
@@ -65,6 +67,7 @@ class Game extends createjs.Container{
             }
         });
 
+        //update card values from server
         this.socket.on('updateCard', function (data) {
             self.cards[data.cardId].setType(data.cardType);
             self.cards[data.cardId].setRotation(data.cardRotation);
@@ -72,14 +75,17 @@ class Game extends createjs.Container{
             self.drawCards();
         });
 
+        //update player values from server
         this.socket.on('updatePlayer', function (data) {
             self.playerList.setPlayerScore(data);
         });
 
+        //add a card to the field
         this.socket.on('addCard', function (data) {
             self.addCard(data.xPosGrid, data.yPosGrid, data.cardId, data.cardType, data.cardRotation);
         });
 
+        //card is valid
         this.socket.on('cardValid', function () {
            console.log("card Valid");
         });

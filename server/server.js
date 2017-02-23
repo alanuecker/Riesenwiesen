@@ -52,6 +52,18 @@ class Server{
                 field.checkPlacement(socketSelectedCard, socket);
             });
 
+            //player reset a card
+            socket.on('resetCard', function () {
+                field.resetCardType(socketSelectedCard);
+                socketLastSelectedCard = -1;
+                socketSelectedCard = -1;
+            });
+
+            //player want's new card
+            socket.on('newCard', function () {
+
+            });
+
             //player left the game
             socket.on('disconnect', function () {
                 self.playerManager.playerLeft(socketPlayerName);
