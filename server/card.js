@@ -41,4 +41,8 @@ module.exports = class Card{
     getRotation(){
         return this.cardRotation;
     }
+
+    getCardPlaced(){
+        return this.cardPlaced;
+    }
 };

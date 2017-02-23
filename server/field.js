@@ -61,10 +61,9 @@ module.exports = class Field{
     //init the basic field with
     initField(){
         this.setPosition(0, 0, 1);
-        this.setPosition(0, 1, 0);
-        this.setPosition(0, -1, 0);
-        this.setPosition(1, 0, 0);
-        this.setPosition(-1, 0, 0);
+        this.fillSurroundingCards(0, 0);
+
+        this.cards[0].setCardPlaced(true);
     }
 
     //set a card at a specific position
@@ -102,6 +101,9 @@ module.exports = class Field{
 
 
     setCardType(id){
+        if(this.cards[id].getCardPlaced())
+            return;
+
         this.cards[id].cardType++;
         if(this.cards[id].cardType > 6)
             this.cards[id].cardType = 0;
@@ -110,6 +112,9 @@ module.exports = class Field{
     }
 
     setCardRotation(id){
+        if(this.cards[id].getCardPlaced())
+            return;
+
         this.cards[id].cardRotation++;
         if(this.cards[id].cardRotation > 3)
             this.cards[id].cardRotation = 0;
@@ -176,6 +181,7 @@ module.exports = class Field{
         return surroundingTypes;
     }
 
+    //create an empty card on all sides of the placed card
     fillSurroundingCards(x, y){
         if(this.getPositionType(this.getPositionID(x + 1, y)) < 0){
             this.setPosition(x + 1, y, 0);
@@ -290,5 +296,14 @@ module.exports = class Field{
 
         cardA.setSide(sideA, 1);
         cardB.setSide(sideB, 1);
+    }
+
+    //reset the card if it exists and ist not placed
+    resetCardType(id){
+        if(this.cards[id] != undefined)
+            if(!this.cards[id].getCardPlaced()){
+                this.cards[id].setType(0);
+                this.gameServer.sendUpdateCard(this.cards[id]);
+            }
     }
 };

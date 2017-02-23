@@ -16,7 +16,8 @@ class Server{
 
         io.on('connection', function (socket) {
             let socketPlayerName = "";
-            let socketSelectedCard = 0;
+            let socketSelectedCard = -1;
+            let socketLastSelectedCard = -1;
 
             console.log("Somebody connected!");
 
@@ -30,13 +31,20 @@ class Server{
 
             //player changed a cards type
             socket.on('changeCardType', function (id) {
-                field.setCardType(id);
-                socketSelectedCard = id;
+                if(id > 0){
+                    if(socketSelectedCard != id){
+                        socketLastSelectedCard = socketSelectedCard;
+                        field.resetCardType(socketLastSelectedCard);
+                    }
+                    field.setCardType(id);
+                    socketSelectedCard = id;
+                }
             });
 
             //player rotated a card
             socket.on('changeCardRotation', function (id) {
-                field.setCardRotation(id);
+                if(id == socketSelectedCard)
+                    field.setCardRotation(id);
             });
 
             //player applied a card
