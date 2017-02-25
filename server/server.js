@@ -107,6 +107,10 @@ class Server{
     sendCardValid(socket){
         socket.emit('cardValid');
     }
+
+    sendPositionPrediction(possibleCards, socket){
+        socket.emit('positionPrediction', possibleCards);
+    }
 }
 
 let server = new Server();

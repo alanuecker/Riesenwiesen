@@ -66,14 +66,6 @@ module.exports = class Field{
         this.cards[0].setCardPlaced(true);
     }
 
-    //set a card at a specific position
-    setPosition(x, y, type){
-        let coordinate = x + ", " + y;
-        this.cards.push(new Card(x, y, this.numberOfCards, type));
-        this.field.set(coordinate, this.numberOfCards);
-        this.numberOfCards++;
-    }
-
     //get the id of the card at this position
     //return -1 if not found
     getPositionID(x, y){
@@ -97,30 +89,6 @@ module.exports = class Field{
     //return all cards
     getCards(){
         return this.cards;
-    }
-
-    //change the type of a card by 1
-    setCardType(id){
-        if(this.cards[id].getCardPlaced())
-            return;
-
-        this.cards[id].cardType++;
-        if(this.cards[id].cardType > 6)
-            this.cards[id].cardType = 0;
-
-        this.gameServer.sendUpdateCard(this.cards[id]);
-    }
-
-    //change the rotation of a card by 1
-    setCardRotation(id){
-        if(this.cards[id].getCardPlaced())
-            return;
-
-        this.cards[id].cardRotation++;
-        if(this.cards[id].cardRotation > 3)
-            this.cards[id].cardRotation = 0;
-
-        this.gameServer.sendUpdateCard(this.cards[id]);
     }
 
     getSurroundingIds(x, y){
@@ -180,6 +148,49 @@ module.exports = class Field{
         return surroundingTypes;
     }
 
+    getAllEdgeCards(){
+        let edgeCards = [];
+
+        for(let card of this.cards){
+            if(card.getType() == 0)
+                edgeCards.push(card);
+        }
+
+        return edgeCards;
+    }
+
+    //change the type of a card by 1
+    setCardType(id){
+        if(this.cards[id].getCardPlaced())
+            return;
+
+        this.cards[id].cardType++;
+        if(this.cards[id].cardType > 6)
+            this.cards[id].cardType = 0;
+
+        this.gameServer.sendUpdateCard(this.cards[id]);
+    }
+
+    //change the rotation of a card by 1
+    setCardRotation(id){
+        if(this.cards[id].getCardPlaced())
+            return;
+
+        this.cards[id].cardRotation++;
+        if(this.cards[id].cardRotation > 3)
+            this.cards[id].cardRotation = 0;
+
+        this.gameServer.sendUpdateCard(this.cards[id]);
+    }
+
+    //set a card at a specific position
+    setPosition(x, y, type){
+        let coordinate = x + ", " + y;
+        this.cards.push(new Card(x, y, this.numberOfCards, type));
+        this.field.set(coordinate, this.numberOfCards);
+        this.numberOfCards++;
+    }
+
     //create an empty card on all sides of the placed card
     fillSurroundingCards(x, y){
         if(this.getPositionType(this.getPositionID(x + 1, y)) < 0){
@@ -237,12 +248,12 @@ module.exports = class Field{
         let cardValid = true;
         let card = this.cards[cardID];
         //get the surrounding cards
-        let surrondingCards = this.getSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
+        let surroundingCards = this.getSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
 
         //go through all surrounding cards and check if their intersecting sides are free or the right card type is selected
-        for(let i in surrondingCards){
-            if(surrondingCards[i] != undefined && surrondingCards[i].getType() != 0){
-                if(!this.checkSides(i, card, surrondingCards[i]))
+        for(let i in surroundingCards){
+            if(surroundingCards[i] != undefined && surroundingCards[i].getType() != 0){
+                if(!this.checkSides(i, card, surroundingCards[i]))
                     cardValid = false;
             }
         }
@@ -251,12 +262,14 @@ module.exports = class Field{
         if(cardValid){
             card.setCardPlaced(true);
 
-            this.gameServer.sendCardValid(socket);
             this.fillSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
+            this.gameServer.sendCardValid(socket);
 
-            for(let i in surrondingCards){
-                if(surrondingCards[i] != undefined){
-                    this.placeSides(i, card, surrondingCards[i]);
+            this.predictNotPossiblePositions(2, socket);
+
+            for(let i in surroundingCards){
+                if(surroundingCards[i] != undefined){
+                    this.placeSides(i, card, surroundingCards[i]);
                 }
             }
         }
@@ -264,36 +277,90 @@ module.exports = class Field{
 
     //check if the side on cardA and the intersecting side on cardB have the same type
     checkSides(sideA, cardA, cardB){
-        let sideB = 0;
         sideA = parseInt(sideA);
-        //find the intersecting side on the other card
-        if(sideA < 2)
-            sideB = (sideA + 2);
-        else
-            sideB = (sideA - 2);
+        let sideB = this.correspondingSide(sideA);
 
         return this.cardSides.cards[cardA.getType()].sides[this.sideArrayPosition(cardA.getRotation(), sideA)] === this.cardSides.cards[cardB.getType()].sides[this.sideArrayPosition(cardB.getRotation(), sideB)];
     }
 
     //if the card is placed, mark the side in the card as 1
     placeSides(sideA, cardA, cardB){
-        let sideB = 0;
         sideA = parseInt(sideA);
-        if(sideA < 2)
-            sideB = sideA + 2;
-        else
-            sideB = sideA - 2;
+        let sideB = this.correspondingSide(sideA);
 
         cardA.setSide(sideA, 1);
         cardB.setSide(sideB, 1);
     }
 
-    //reset the card if it exists and ist not placed
+    correspondingSide(sideA){
+        let sideB = 0;
+        //find the intersecting side on the other card
+        if(sideA < 2)
+            sideB = sideA + 2;
+        else
+            sideB = sideA - 2;
+
+        return sideB;
+    }
+
+    //reset the card if it exists and is not placed
     resetCardType(id){
         if(this.cards[id] != undefined)
             if(!this.cards[id].getCardPlaced()){
                 this.cards[id].setType(0);
                 this.gameServer.sendUpdateCard(this.cards[id]);
             }
+    }
+
+    //predict positions which are not possible based on card type
+    predictNotPossiblePositions(cardType, socket){
+        let edgeCards = this.getAllEdgeCards();
+        let notPossibleCards = [];
+
+        //go through all edge cards to check if they are a possible position
+        for(let eCard of edgeCards){
+            let surroundingCards = this.getSurroundingCards(eCard.getXPosGrid(), eCard.getYPosGrid());
+            //sides the card has to have
+            let sidesA = ['none', 'none', 'none', 'none'];
+            let cardPossible = false;
+
+            //get the sides from surrounding cards
+            for(let i in surroundingCards){
+                if(surroundingCards[i] === undefined || surroundingCards[i].getType() == 0)
+                    continue;
+
+                let sideB = this.correspondingSide(parseInt(i));
+                sidesA[i] = this.cardSides.cards[surroundingCards[i].getType()].sides[this.sideArrayPosition(surroundingCards[i].getRotation(), sideB)];
+            }
+
+            //check all card rotations
+            for(let i = 0; i < 4; i++){
+                let rotationPossible = false;
+
+                //check all card sides
+                for(let j = 0; j < sidesA.length; j++){
+                    //skip if side is empty
+                    if(sidesA[j] == 'none')
+                        continue;
+
+                    let sideB = this.cardSides.cards[cardType].sides[this.sideArrayPosition(i, j)];
+
+                    if(sidesA[j] === sideB){
+                        rotationPossible = true;
+                        break;
+                    }
+                }
+
+                if(rotationPossible){
+                    cardPossible = true;
+                    break;
+                }
+            }
+
+            if(!cardPossible)
+                notPossibleCards.push(eCard);
+        }
+
+        this.gameServer.sendPositionPrediction(notPossibleCards, socket);
     }
 };

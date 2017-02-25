@@ -35,7 +35,7 @@ class Game extends createjs.Container{
 
         let applyButton = new Button(50, 25, 15, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Apply", 15, "black", function () {self.socket.emit('applyCard');});
         let resetButton = new Button(50, 25, 100, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Reset", 15, "black", function () {self.socket.emit('resetCard');});
-        let newCardButton = new Button(50, 25, 185, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "New Card", 15, "black", function () {self.socket.emit('newCard');});
+        let newCardButton = new Button(75, 25, 185, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "New Card", 15, "black", function () {self.socket.emit('newCard');});
 
         content.addChild(this.field, this.playerList, applyButton, resetButton, newCardButton);
     }
@@ -89,6 +89,10 @@ class Game extends createjs.Container{
         this.socket.on('cardValid', function () {
            console.log("card Valid");
         });
+        
+        this.socket.on('positionPrediction', function (possibleCards) {
+            console.log(possibleCards);
+        })
     };
 
     handleLogic() {
