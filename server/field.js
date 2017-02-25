@@ -91,15 +91,6 @@ module.exports = class Field{
         return this.cards;
     }
 
-    getSurroundingIds(x, y){
-         let surroundingIds = [this.getPositionID(x, y + 1)];
-         surroundingIds.push(this.getPositionID(x + 1, y));
-         surroundingIds.push(this.getPositionID(x, y - 1));
-         surroundingIds.push(this.getPositionID(x - 1, y));
-
-         return surroundingIds;
-    }
-
     getSurroundingCards(x, y){
         let surroundingCards = [this.cards[this.getPositionID(x, y + 1)]];
         surroundingCards.push(this.cards[this.getPositionID(x + 1, y)]);
@@ -107,25 +98,6 @@ module.exports = class Field{
         surroundingCards.push(this.cards[this.getPositionID(x - 1, y)]);
 
         return surroundingCards;
-    }
-
-    getSurroundingTypes(x, y){
-        let surroundingTypes = [this.getPositionType(this.getPositionID(x, y + 1))];
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x + 1, y)));
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x, y - 1)));
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x - 1, y)));
-
-        return surroundingTypes;
-    }
-
-    getAllSurroundingIds(x, y){
-        let surroundingIds = this.getSurroundingIds(x, y);
-        surroundingIds.push(this.getPositionID(x - 1, y + 1));
-        surroundingIds.push(this.getPositionID(x + 1, y + 1));
-        surroundingIds.push(this.getPositionID(x + 1, y - 1));
-        surroundingIds.push(this.getPositionID(x - 1, y - 1));
-
-        return surroundingIds;
     }
 
     getAllSurroundingCards(x, y){
@@ -136,16 +108,6 @@ module.exports = class Field{
         surroundingCards.push(this.cards[this.getPositionID(x - 1, y - 1)]);
 
         return surroundingCards;
-    }
-
-    getAllSurroundingTypes(x, y){
-        let surroundingTypes = this.getSurroundingTypes(x, y);
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x - 1, y + 1)));
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x + 1, y + 1)));
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x + 1, y - 1)));
-        surroundingTypes.push(this.getPositionType(this.getPositionID(x - 1, y - 1)));
-
-        return surroundingTypes;
     }
 
     getAllEdgeCards(){
@@ -160,13 +122,11 @@ module.exports = class Field{
     }
 
     //change the type of a card by 1
-    setCardType(id){
+    setCardType(id, type){
         if(this.cards[id].getCardPlaced())
             return;
 
-        this.cards[id].cardType++;
-        if(this.cards[id].cardType > 6)
-            this.cards[id].cardType = 0;
+        this.cards[id].setType(type);
 
         this.gameServer.sendUpdateCard(this.cards[id]);
     }
@@ -264,8 +224,7 @@ module.exports = class Field{
 
             this.fillSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
             this.gameServer.sendCardValid(socket);
-
-            this.predictNotPossiblePositions(2, socket);
+            socket.newCardType();
 
             for(let i in surroundingCards){
                 if(surroundingCards[i] != undefined){

@@ -15,11 +15,18 @@ class Server{
         this.playerManager = new PlayerManager(this);
 
         io.on('connection', function (socket) {
+            console.log("Somebody connected!");
             let socketPlayerName = "";
             let socketSelectedCard = -1;
             let socketLastSelectedCard = -1;
+            let socketCardType = 0;
 
-            console.log("Somebody connected!");
+            //get a new card type for the player to place
+            socket.newCardType = function () {
+                socketCardType = Math.floor(Math.random() * (6 - 1 +1)) + 1;
+                socket.emit('newPlaceCardType', socketCardType);
+            };
+            socket.newCardType();
 
             socket.on('setPlayerName', function (playerName) {
                 self.playerManager.checkPlayerName(playerName, socket);
@@ -36,7 +43,7 @@ class Server{
                         socketLastSelectedCard = socketSelectedCard;
                         field.resetCardType(socketLastSelectedCard);
                     }
-                    field.setCardType(id);
+                    field.setCardType(id, socketCardType);
                     socketSelectedCard = id;
                 }
             });
@@ -61,7 +68,7 @@ class Server{
 
             //player want's new card
             socket.on('newCard', function () {
-
+                socketCardType = socket.newCardType();
             });
 
             //player left the game
