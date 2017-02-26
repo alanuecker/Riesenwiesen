@@ -9,12 +9,12 @@ class Card extends createjs.Container{
         this.cardRotation = 0;
         this.cardRotationType = rotation;
         this.width = 100;
-        this.color = ["grey", "green"];
+        this.color = ["grey", "green", "#555"];
         this.cardPlaced = false;
+        this.cardPredicted = true;
 
         this.refreshPosition();
         this.init();
-
     }
 
     init(){
@@ -28,15 +28,15 @@ class Card extends createjs.Container{
         this.rectCommand = rect.graphics.beginFill(this.color[0]).command;
         rect.graphics.drawRect(0, 0, this.width, this.width);
 
-
         rect.addEventListener("mousedown", function (event) {
             if(!this.getCardPlaced()){
                 if(event.nativeEvent.button == 0){
                     //left button
-                    game.sendSelectedCard(this.cardId);
+                    if(this.getCardPredicted())
+                        game.sendSelectedCard(this.cardId);
                 }else{
                     //right or middle button
-                    game.sendRotateCard(this.cardId);
+                    game.sendRotateCard();
                 }
             }
         }.bind(this));
@@ -113,7 +113,10 @@ class Card extends createjs.Container{
 
         switch (value){
             case 0:
-                this.rectCommand.style = this.color[0];
+                if(!this.cardPredicted)
+                    this.rectCommand.style = this.color[2];
+                else
+                    this.rectCommand.style = this.color[0];
                 break;
             case 1:
                 this.rectCommand.style = this.color[1];
@@ -150,6 +153,14 @@ class Card extends createjs.Container{
         this.cardPlaced = value;
     }
 
+    setCardPredicted(value){
+        this.cardPredicted = value;
+        if(this.cardPredicted)
+            this.rectCommand.style = this.color[0];
+        else
+            this.rectCommand.style = this.color[2];
+    }
+
     getXPosGrid(){
         return this.xPosGrid;
     }
@@ -174,9 +185,13 @@ class Card extends createjs.Container{
         return this.cardPlaced;
     }
 
+    getCardPredicted(){
+        return this.cardPredicted;
+    }
+
     refreshPosition(){
-        let x = this.xPosGrid * this.width + screenWidth/2 - this.width/2 + global.offsetX;
-        let y =  -1 * this.yPosGrid * this.width + screenHeight/2 - this.width/2 + global.offsetY;
+        let x = this.xPosGrid * this.width + screenWidth/2 - global.offsetX;
+        let y =  -1 * this.yPosGrid * this.width + screenHeight/2 + this.width + global.offsetY;
         this.xPos = x;
         this.yPos = y;
     }

@@ -8,11 +8,17 @@ class Game extends createjs.Container{
         this.field = new createjs.Container();
         this.playerList = new PlayerList();
         this.drawCards();
+        this.cardNotPossible = [];
 
         this.init();
     };
 
     init(){
+        this.placeCard = new Card(0, 0, 0, 0, 0);
+        this.drawPlaceCard();
+
+        content.addChild(this.placeCard);
+
         function keyPressed(event) {
 
             switch(event.keyCode){
@@ -90,9 +96,27 @@ class Game extends createjs.Container{
            console.log("card Valid");
         });
         
-        this.socket.on('positionPrediction', function (possibleCards) {
-            console.log(possibleCards);
-        })
+        this.socket.on('positionPrediction', function (notPossibleCards) {
+            for(let i in self.cardNotPossible){
+                self.cards[self.cardNotPossible[i]].setCardPredicted(true);
+            }
+
+            self.cardNotPossible = notPossibleCards;
+
+            for(let i in self.cardNotPossible){
+                self.cards[self.cardNotPossible[i]].setCardPredicted(false);
+            }
+
+            console.log(notPossibleCards);
+        });
+
+        this.socket.on('newPlaceCardType', function (cardType) {
+           self.placeCard.setType(cardType);
+        });
+
+        this.socket.on('placeCardRotation', function (rotation) {
+           self.placeCard.setRotation(rotation);
+        });
     };
 
     handleLogic() {
@@ -112,6 +136,11 @@ class Game extends createjs.Container{
         }
     }
 
+    drawPlaceCard(){
+        this.placeCard.xPos = screenWidth - this.placeCard.getWidth() - 15;
+        this.placeCard.yPos = screenHeight - this.placeCard.getWidth() - 15;
+    }
+
     //player selected a card and send that data to server
     sendSelectedCard(id){
         this.socket.emit('changeCardType', id);
@@ -122,8 +151,8 @@ class Game extends createjs.Container{
         this.socket.emit('setPlayerName', playerName);
     }
 
-    sendRotateCard(id){
-        this.socket.emit('changeCardRotation', id);
+    sendRotateCard(){
+        this.socket.emit('changeCardRotation');
     }
 
     //create a new card and add it

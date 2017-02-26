@@ -20,11 +20,30 @@ class Server{
             let socketSelectedCard = -1;
             let socketLastSelectedCard = -1;
             let socketCardType = 0;
+            let socketCardRotation = 0;
+
+            function resetSelectedCard() {
+                socketLastSelectedCard = -1;
+                socketSelectedCard = -1;
+            }
 
             //get a new card type for the player to place
             socket.newCardType = function () {
+                let old = socketCardType;
+
                 socketCardType = Math.floor(Math.random() * (6 - 1 +1)) + 1;
+
+                //prevent same card as old
+                if(old == socketCardType){
+                    socket.newCardType();
+                    return;
+                }
+
                 socket.emit('newPlaceCardType', socketCardType);
+                field.predictNotPossiblePositions(socketCardType, socket);
+
+                if(socketSelectedCard > 0)
+                    field.resetCardType(socketSelectedCard);
             };
             socket.newCardType();
 
@@ -45,36 +64,47 @@ class Server{
                     }
                     field.setCardType(id, socketCardType);
                     socketSelectedCard = id;
+                    field.setCardRotation(socketSelectedCard, socketCardRotation);
+                    self.sendPlaceCardRotation(socketCardRotation, socket);
                 }
             });
 
             //player rotated a card
-            socket.on('changeCardRotation', function (id) {
-                if(id == socketSelectedCard)
-                    field.setCardRotation(id);
+            socket.on('changeCardRotation', function () {
+                socketCardRotation++;
+                if(socketCardRotation > 3)
+                    socketCardRotation = 0;
+
+                if(socketSelectedCard > 0){
+                    field.setCardRotation(socketSelectedCard, socketCardRotation);
+                    self.sendPlaceCardRotation(socketCardRotation, socket);
+                }
             });
 
             //player applied a card
             socket.on('applyCard', function () {
                 field.checkPlacement(socketSelectedCard, socket);
+                resetSelectedCard();
             });
 
             //player reset a card
             socket.on('resetCard', function () {
                 field.resetCardType(socketSelectedCard);
-                socketLastSelectedCard = -1;
-                socketSelectedCard = -1;
+                resetSelectedCard();
             });
 
             //player want's new card
             socket.on('newCard', function () {
-                socketCardType = socket.newCardType();
+                socket.newCardType();
+                resetSelectedCard();
             });
 
             //player left the game
             socket.on('disconnect', function () {
                 self.playerManager.playerLeft(socketPlayerName);
                 io.emit('playerLeftGame', socketPlayerName);
+                field.resetCardType(socketSelectedCard);
+                resetSelectedCard();
             });
         });
 
@@ -117,6 +147,10 @@ class Server{
 
     sendPositionPrediction(possibleCards, socket){
         socket.emit('positionPrediction', possibleCards);
+    }
+
+    sendPlaceCardRotation(rotation, socket){
+        socket.emit('placeCardRotation', rotation);
     }
 }
 

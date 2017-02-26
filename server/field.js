@@ -132,13 +132,11 @@ module.exports = class Field{
     }
 
     //change the rotation of a card by 1
-    setCardRotation(id){
+    setCardRotation(id, rotation){
         if(this.cards[id].getCardPlaced())
             return;
 
-        this.cards[id].cardRotation++;
-        if(this.cards[id].cardRotation > 3)
-            this.cards[id].cardRotation = 0;
+        this.cards[id].setRotation(rotation);
 
         this.gameServer.sendUpdateCard(this.cards[id]);
     }
@@ -231,6 +229,8 @@ module.exports = class Field{
                     this.placeSides(i, card, surroundingCards[i]);
                 }
             }
+        }else{
+            this.resetCardType(cardID);
         }
     }
 
@@ -317,7 +317,7 @@ module.exports = class Field{
             }
 
             if(!cardPossible)
-                notPossibleCards.push(eCard);
+                notPossibleCards.push(eCard.getCardId());
         }
 
         this.gameServer.sendPositionPrediction(notPossibleCards, socket);

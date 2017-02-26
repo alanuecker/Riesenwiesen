@@ -123,4 +123,5 @@ window.addEventListener('resize', function() {
     c.height = screenHeight;
 
     game.drawCards();
+    game.drawPlaceCard();
 }, true);
