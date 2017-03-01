@@ -17,16 +17,14 @@ class Game extends createjs.Container{
         this.placeCard = new Card(0, 0, 0, 0, 0);
         this.drawPlaceCard();
 
-        content.addChild(this.placeCard);
-
         function keyPressed(event) {
 
             switch(event.keyCode){
                 case global.KEY_RIGHT:
-                    global.offsetX -= 100;
+                    global.offsetX += 100;
                     break;
                 case global.KEY_LEFT:
-                    global.offsetX += 100;
+                    global.offsetX -= 100;
                     break;
                 case global.KEY_UP:
                     global.offsetY += 100;
@@ -39,16 +37,22 @@ class Game extends createjs.Container{
 
         document.onkeydown = keyPressed;
 
-        let applyButton = new Button(50, 25, 15, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Apply", 15, "black", function () {self.socket.emit('applyCard');});
-        let resetButton = new Button(50, 25, 100, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "Reset", 15, "black", function () {self.socket.emit('resetCard');});
-        let newCardButton = new Button(75, 25, 185, 300, "#EEEEEE", "#CCCCCC", "#DDDDDD", "black", "New Card", 15, "black", function () {self.socket.emit('newCard');});
+        this.controls = new createjs.Container();
 
-        content.addChild(this.field, this.playerList, applyButton, resetButton, newCardButton);
+        let applyButton = new Button(100, 40, 395, 0, "#2ecc71", "#55D88B", "#55D88B", "Apply", 18, "white", function () {self.socket.emit('applyCard');});
+        let resetButton = new Button(100, 40, 165, 0, "#2ecc71", "#55D88B", "#55D88B", "Reset", 18, "white", function () {self.socket.emit('resetCard');});
+        let newCardButton = new Button(150, 40, 0, 0, "#2ecc71", "#55D88B", "#55D88B", "New Card", 18, "white", function () {self.socket.emit('newCard');});
+        let rotateCardButton = new Button(100, 40, 280, 0, "#2ecc71", "#55D88B", "#55D88B", "Rotate", 18, "white", function () {self.socket.emit('changeCardRotation');});
+
+        this.drawControls();
+
+        this.controls.addChild(applyButton, resetButton, newCardButton, rotateCardButton);
+
+        content.addChild(this.field, this.playerList, this.controls, this.placeCard);
     }
 
     handleNetwork() {
         this.socket.on('playerValid', function (playerValid) {
-            console.log("player name valid " + playerValid);
             checkedNick(playerValid);
         });
         
@@ -93,7 +97,6 @@ class Game extends createjs.Container{
 
         //card is valid
         this.socket.on('cardValid', function () {
-           console.log("card Valid");
         });
         
         this.socket.on('positionPrediction', function (notPossibleCards) {
@@ -103,11 +106,11 @@ class Game extends createjs.Container{
 
             self.cardNotPossible = notPossibleCards;
 
-            for(let i in self.cardNotPossible){
-                self.cards[self.cardNotPossible[i]].setCardPredicted(false);
+            if(self.cards.length != 0){
+                for(let i in self.cardNotPossible){
+                    self.cards[self.cardNotPossible[i]].setCardPredicted(false);
+                }
             }
-
-            console.log(notPossibleCards);
         });
 
         this.socket.on('newPlaceCardType', function (cardType) {
@@ -137,8 +140,13 @@ class Game extends createjs.Container{
     }
 
     drawPlaceCard(){
-        this.placeCard.xPos = screenWidth - this.placeCard.getWidth() - 15;
-        this.placeCard.yPos = screenHeight - this.placeCard.getWidth() - 15;
+        this.placeCard.xPos = screenWidth - 30 - this.placeCard.getWidth()/2;
+        this.placeCard.yPos = screenHeight - 30 - this.placeCard.getWidth()/2;
+    }
+
+    drawControls(){
+        this.controls.xPos = 30;
+        this.controls.yPos = screenHeight - 70;
     }
 
     //player selected a card and send that data to server
@@ -147,7 +155,6 @@ class Game extends createjs.Container{
     }
 
     sendPlayerName(playerName){
-        console.log("send player name " + playerName);
         this.socket.emit('setPlayerName', playerName);
     }
 

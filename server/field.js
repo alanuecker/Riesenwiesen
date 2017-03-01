@@ -13,47 +13,49 @@ module.exports = class Field{
                 {
                     "cardType": 0,
                     "numFields": "none",
-                    "numStreets": ["none", "none", "none", "none"],
-                    "sides": "none"
+                    "numRivers": 0,
+                    "sides":["none", "none", "none", "none"]
                 },
                 {
                     "cardType": 1,
                     "numFields": 4,
-                    "numStreets": 0,
+                    "numRivers": 0,
                     "sides": ["field", "field", "field", "field"]
                 },
                 {
                     "cardType": 2,
                     "numFields": 2,
-                    "numStreets": 2,
-                    "sides": ["street", "field", "street", "field"]
+                    "numRivers": 2,
+                    "sides": ["river", "field", "river", "field"]
                 },
                 {
                     "cardType": 3,
                     "numFields": 2,
-                    "numStreets": 2,
-                    "sides": ["field", "field", "street", "street"]
+                    "numRivers": 2,
+                    "sides": ["field", "field", "river", "river"]
                 },
                 {
                     "cardType": 4,
                     "numFields": 0,
-                    "numStreets": 4,
-                    "sides": ["street", "street", "street", "street"]
+                    "numRivers": 4,
+                    "sides": ["river", "river", "river", "river"]
                 },
                 {
                     "cardType": 5,
                     "numFields": 3,
-                    "numStreets": 1,
-                    "sides": ["street", "field", "field", "field"]
+                    "numRivers": 1,
+                    "sides": ["river", "field", "field", "field"]
                 },
                 {
                     "cardType": 6,
                     "numFields": 1,
-                    "numStreets": 3,
-                    "sides": ["street", "field", "street", "street"]
+                    "numRivers": 3,
+                    "sides": ["river", "field", "river", "river"]
                 }
             ]
         };
+
+        this.numberOfCardTypes = this.cardSides.cards.length;
 
         this.initField();
     }
@@ -121,7 +123,7 @@ module.exports = class Field{
         return edgeCards;
     }
 
-    //change the type of a card by 1
+    //change the type of a card
     setCardType(id, type){
         if(this.cards[id].getCardPlaced())
             return;
@@ -131,7 +133,7 @@ module.exports = class Field{
         this.gameServer.sendUpdateCard(this.cards[id]);
     }
 
-    //change the rotation of a card by 1
+    //change the rotation of a card
     setCardRotation(id, rotation){
         if(this.cards[id].getCardPlaced())
             return;
@@ -306,6 +308,8 @@ module.exports = class Field{
 
                     if(sidesA[j] === sideB){
                         rotationPossible = true;
+                    }else{
+                        rotationPossible = false;
                         break;
                     }
                 }

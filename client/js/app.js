@@ -124,4 +124,5 @@ window.addEventListener('resize', function() {
 
     game.drawCards();
     game.drawPlaceCard();
+    game.drawControls();
 }, true);

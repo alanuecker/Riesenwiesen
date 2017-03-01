@@ -46,11 +46,11 @@ class PlayerElement extends createjs.Container{
         this.playerName = playerName;
         this.playerScore = playerScore;
 
-        this.playerText = new createjs.Text(this.playerName, "18px Arial", "black");
+        this.playerText = new createjs.Text(this.playerName, "18px Arial", "white");
         this.playerText.yPos = position + this.spacing;
         this.playerText.xPos = 15;
 
-        this.scoreText = new createjs.Text(this.playerScore, "18px Arial", "black");
+        this.scoreText = new createjs.Text(this.playerScore, "18px Arial", "white");
         this.scoreText.yPos = position + this.spacing;
         this.scoreText.xPos = 115;
 
@@ -82,7 +82,7 @@ class PlayerElement extends createjs.Container{
 createjs.promote(PlayerElement, "Container");
 
 class Button extends createjs.Container{
-    constructor(width, height, xPos, yPos, background, backgroundClick, backgroundHover, frameColor, text, textSize, textColor, handleClick) {
+    constructor(width, height, xPos, yPos, background, backgroundClick, backgroundHover, text, textSize, textColor, handleClick) {
         super();
 
         this.width = width;
@@ -90,7 +90,6 @@ class Button extends createjs.Container{
         this.background = background;
         this.backgroundClick = backgroundClick;
         this.backgroundHover = backgroundHover;
-        this.frameColor = frameColor;
         this.text = text;
         this.textColor = textColor;
         this.textSize = textSize;
@@ -109,9 +108,6 @@ class Button extends createjs.Container{
         //backgroundElement
         this.backgroundElement = new createjs.Shape();
         this.backgroundElement.graphics.beginFill(this.background).drawRect(0, 0, this.width, this.height);
-        //frame
-        this.frame = new createjs.Shape();
-        this.frame.graphics.setStrokeStyle(2).beginStroke(this.frameColor).drawRect(-this.padding/2, -this.padding/2, this.width+this.padding, this.height+this.padding).endStroke();
         //text
         this.textElement = new createjs.Text(this.text, this.textSize + "px Arial", this.textColor);
         //center text
@@ -139,7 +135,7 @@ class Button extends createjs.Container{
         this.backgroundElement.addEventListener("mouseout", handleOverEvent.bind(this));
 
         //add childs
-        this.addChild(this.backgroundElement, this.frame, this.textElement);
+        this.addChild(this.backgroundElement, this.textElement);
     };
 }
 createjs.promote(Button, "Container");

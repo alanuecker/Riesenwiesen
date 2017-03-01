@@ -16,7 +16,7 @@ class Server{
 
         io.on('connection', function (socket) {
             console.log("Somebody connected!");
-            let socketPlayerName = "";
+            socket.playerName = "";
             let socketSelectedCard = -1;
             let socketLastSelectedCard = -1;
             let socketCardType = 0;
@@ -31,7 +31,7 @@ class Server{
             socket.newCardType = function () {
                 let old = socketCardType;
 
-                socketCardType = Math.floor(Math.random() * (6 - 1 +1)) + 1;
+                socketCardType = Math.floor(Math.random() * (field.numberOfCardTypes - 1)) + 1;
 
                 //prevent same card as old
                 if(old == socketCardType){
@@ -49,7 +49,7 @@ class Server{
 
             socket.on('setPlayerName', function (playerName) {
                 self.playerManager.checkPlayerName(playerName, socket);
-                socketPlayerName = playerName;
+                socket.playerName = playerName;
             });
 
             //send connected player field data
@@ -101,8 +101,8 @@ class Server{
 
             //player left the game
             socket.on('disconnect', function () {
-                self.playerManager.playerLeft(socketPlayerName);
-                io.emit('playerLeftGame', socketPlayerName);
+                self.playerManager.playerLeft(socket.playerName);
+                io.emit('playerLeftGame', socket.playerName);
                 field.resetCardType(socketSelectedCard);
                 resetSelectedCard();
             });
@@ -142,6 +142,7 @@ class Server{
     }
 
     sendCardValid(socket){
+        this.playerManager.addPoint(socket.playerName);
         socket.emit('cardValid');
     }
 
