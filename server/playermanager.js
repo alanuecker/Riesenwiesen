@@ -17,7 +17,6 @@ module.exports = class PlayerManager{
             this.playerActive = this.playerActive.filter(function (n) {return n.getPlayerName() !== playerName;});
         else
             this.playerActive.pop();
-
         this.setPlayerActiveValue(playerName, false);
     }
 
@@ -35,7 +34,7 @@ module.exports = class PlayerManager{
             this.addNewPlayer(playerName);
             this.gameServer.sendPlayerNameValid(true, socket);
         }else {
-            let playerNotInList = false;
+            let playerNotInList = true;
 
             for(let i in this.playerList){
                 if(playerName == this.playerList[i].getPlayerName()){
@@ -43,13 +42,13 @@ module.exports = class PlayerManager{
                         this.playerJoined(playerName);
                         this.gameServer.sendPlayerNameValid(true, socket);
                         playerNotInList = false;
+                        break;
                     }
                     else{
                         this.gameServer.sendPlayerNameValid(false, socket);
                         playerNotInList = false;
+                        break;
                     }
-                }else{
-                    playerNotInList = true;
                 }
             }
 
@@ -81,6 +80,10 @@ module.exports = class PlayerManager{
 
     getPlayerActive(){
         return this.playerActive;
+    }
+
+    getPlayerList(){
+        return this.playerList;
     }
 
     setPlayerActiveValue(playerName, value){

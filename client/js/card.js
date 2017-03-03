@@ -113,10 +113,10 @@ class Card extends createjs.Container{
 
         switch (value){
             case 0:
-                if(!this.cardPredicted)
-                    this.rectCommand.style = this.color[2];
-                else
+                if(this.cardPredicted && !this.cardPlaced)
                     this.rectCommand.style = this.color[0];
+                else
+                    this.rectCommand.style = this.color[2];
                 break;
             case 1:
                 this.rectCommand.style = this.color[1];
@@ -155,6 +155,10 @@ class Card extends createjs.Container{
 
     setCardPredicted(value){
         this.cardPredicted = value;
+
+        if(this.cardPlaced)
+            return;
+
         if(this.cardPredicted)
             this.rectCommand.style = this.color[0];
         else

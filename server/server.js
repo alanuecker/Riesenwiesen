@@ -105,6 +105,7 @@ class Server{
                 io.emit('playerLeftGame', socket.playerName);
                 field.resetCardType(socketSelectedCard);
                 resetSelectedCard();
+                console.log("player left " + socket.playerName);
             });
         });
 

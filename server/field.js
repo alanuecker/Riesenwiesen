@@ -221,7 +221,7 @@ module.exports = class Field{
         //card can be placed
         if(cardValid){
             card.setCardPlaced(true);
-
+            this.gameServer.sendUpdateCard(card);
             this.fillSurroundingCards(card.getXPosGrid(), card.getYPosGrid());
             this.gameServer.sendCardValid(socket);
             socket.newCardType();

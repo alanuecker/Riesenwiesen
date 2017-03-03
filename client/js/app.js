@@ -47,14 +47,11 @@ function startGame() {
 
 // check if nick is valid alphanumeric characters (and underscores)
 function validNick() {
-    console.log("valid nick");
-
     let regex = /^\w*$/;
     return regex.exec(playerNameInput.value) !== null;
 }
 
 function checkedNick(value) {
-    console.log("check nick " + value);
     if(value)
         startGame();
     else{
